@@ -10,7 +10,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json())
 
 //1. GET a random joke
-app.get("/random",async (req,res) => {
+app.get("/random", (req,res) => {
     const randomjoke = Math.floor(Math.random() * jokes.length)
     res.json(jokes[randomjoke])
 })
@@ -72,13 +72,12 @@ app.put("/jokes/:id",(req,res) => {
 //6. PATCH a joke
 app.patch("/jokes/:id",(req,res) => {
   const id = parseInt(req.params.id)
-  const text = req.body.text
-  const type = req.body.type
+  
   const existingJoke  = jokes.find((joke) => joke.id === id)
   const patchjoke = {
     id:id,
-    jokeText: text || existingJoke.jokeText,
-    jokeType: type || existingJoke.jokeType,
+    jokeText: req.body.text || existingJoke.jokeText,
+    jokeType: req.body.type || existingJoke.jokeType,
   }
 
   const replace = jokes.findIndex((joke) => joke.id === id)
@@ -106,7 +105,8 @@ app.delete("/jokes/:id",(req,res) => {
 })
 //8. DELETE All jokes
 app.delete("/all",(req,res) => {
-  const adminkey = req.query.key
+  const adminkey = req.query.key || req.body.key
+  console.log(adminkey)
   if(adminkey === masterKey){
     jokes = []
     res.sendStatus(200)
@@ -114,9 +114,6 @@ app.delete("/all",(req,res) => {
   else {
     res.status(401).json({ error: `You are not authorised to perform this action.` })
   }
-
- 
-
 })
 
 app.listen(port, () => {
