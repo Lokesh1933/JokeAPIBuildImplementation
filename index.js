@@ -1,5 +1,6 @@
 import express from "express";
 import bodyParser from "body-parser";
+import axios from "axios"
 
 const app = express();
 const port = 3000;
@@ -8,10 +9,12 @@ const masterKey = "4VGP2DN-6EWM4SJ-N6FGRHV-Z3PR3TT";
 app.use(bodyParser.urlencoded({ extended: true }));
 
 //1. GET a random joke
-app.get("/random",(req,res) => {
-  
+app.get("/random",async (req,res) => {
+    const randomjoke = Math.floor(Math.random() * jokes.length)
+    res.json(jokes[randomjoke])
 })
 //2. GET a specific joke
+app.get("/jokes/:id", (req,res))
 
 //3. GET a jokes by filtering on the joke type
 
@@ -26,7 +29,7 @@ app.get("/random",(req,res) => {
 //8. DELETE All jokes
 
 app.listen(port, () => {
-  console.log(`Successfully started server on port ${port}.`);
+  console.log(`Server is running on port ${port}.`);
 });
 
 var jokes = [
