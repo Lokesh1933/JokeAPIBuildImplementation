@@ -1,6 +1,5 @@
 import express from "express";
 import bodyParser from "body-parser";
-import axios from "axios"
 
 const app = express();
 const port = 3000;
@@ -14,7 +13,11 @@ app.get("/random",async (req,res) => {
     res.json(jokes[randomjoke])
 })
 //2. GET a specific joke
-app.get("/jokes/:id", (req,res))
+app.get("/jokes/:id", (req,res) => {
+  const id = parseInt(req.params.id)
+  const foundJoke = jokes.find((joke) => joke.id === id)
+  res.json(foundJoke)
+})
 
 //3. GET a jokes by filtering on the joke type
 
