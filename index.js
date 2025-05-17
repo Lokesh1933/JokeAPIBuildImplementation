@@ -17,7 +17,13 @@ app.get("/random",async (req,res) => {
 //2. GET a specific joke
 app.get("/jokes/:id", (req,res) => {
   const id = parseInt(req.params.id)
+  
   const foundJoke = jokes.find((joke) => joke.id === id)
+   if (!foundJoke) {
+    return res.status(404).json({
+      error: "Joke not found with the provided ID.",
+    });
+  }
   res.json(foundJoke)
 })
 
@@ -64,25 +70,54 @@ app.put("/jokes/:id",(req,res) => {
 })
 
 //6. PATCH a joke
-app.put("/jokes/:id",(req,res) => {
-  const id = req.params.id
+app.patch("/jokes/:id",(req,res) => {
+  const id = parseInt(req.params.id)
   const text = req.body.text
   const type = req.body.type
-  const updatejoke = {
+  const existingJoke  = jokes.find((joke) => joke.id === id)
+  const patchjoke = {
     id:id,
-    jokeText: text,
-    jokeType: type,
+    jokeText: text || existingJoke.jokeText,
+    jokeType: type || existingJoke.jokeType,
   }
 
   const replace = jokes.findIndex((joke) => joke.id === id)
-  jokes[replace] = updatejoke
-  res.json(updatejoke)
+  jokes[replace] = patchjoke
+  res.json(patchjoke)
 
 })
 
 //7. DELETE Specific joke
+app.delete("/jokes/:id",(req,res) => {
+  const id = parseInt(req.params.id)
+  const deleteIndex = jokes.findIndex((joke) => joke.id === id)
+  if(deleteIndex > -1){
+    jokes.splice(deleteIndex,1)
+    res.sendStatus(200)
+  } else {
+    res.status(401).json({ error: `Joke with id: ${id} not found. No jokes were deleted.` })
+  }
 
+  const replace = jokes.delete((joke) => joke.id === id)
+  
+  jokes[replace] = updatejoke
+  res.json(updatejoke)
+
+})
 //8. DELETE All jokes
+app.delete("/all",(req,res) => {
+  const adminkey = req.query.key
+  if(adminkey === masterKey){
+    jokes = []
+    res.sendStatus(200)
+  }
+  else {
+    res.status(401).json({ error: `You are not authorised to perform this action.` })
+  }
+
+ 
+
+})
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}.`);
